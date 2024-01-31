@@ -41,10 +41,42 @@ const MainScreen = () => {
     type: "success" | "error";
   } | null>(null);
 
+  const createPrompt = () => {
+    return `Given the following job description, resume, and statement of qualifications description, generate a professional Statement of Qualifications.
+
+    Job Description:
+    ${jobDescription}
+
+    Resume:
+    ${resume}
+
+    Statement of Qualifications Description:
+    ${statementOfQualifications}
+
+    Please create a Statement of Qualifications based on the above information.`;
+  };
+
   const handleRequest = async () => {
     setIsLoading(true);
+    const stuff = createPrompt();
+
     try {
-      // Your request logic here
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ stuff }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      // Extract the result from the response
+      const result = await response.json();
+      console.log(result, "RESULT");
+      setGeneratedStatement(result.data.message.content);
       setIsLoading(false);
       setToast({ message: "Request successful!", type: "success" });
     } catch (error) {
